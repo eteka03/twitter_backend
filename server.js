@@ -1,4 +1,5 @@
 require("dotenv").config();
+const cors = require("cors");
 const { TwitterClient } = require("twitter-api-client");
 const express = require("express");
 const twitterClient = new TwitterClient({
@@ -11,16 +12,25 @@ const twitterClient = new TwitterClient({
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 const app = express();
 app.use(express.json());
+app.use(cors());
 
 app.get("/user", async (req, res) => {
   const { name } = req.query;
 
   try {
-    const data = await twitterClient.tweets.statusesUserTimeline({
-      screen_name: name,
+    const hilaryData = await twitterClient.tweets.statusesUserTimeline({
+      screen_name: "HillaryClinton",
+    });
+    const barackData = await twitterClient.tweets.statusesUserTimeline({
+      screen_name: "BarackObama",
     });
 
-    res.send(data);
+    const joinedData = {
+      HillaryClinton: hilaryData,
+      BarackObama: barackData,
+    };
+
+    res.send(joinedData);
   } catch (error) {
     console.error(error);
   }
